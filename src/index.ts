@@ -1,9 +1,14 @@
 
 import app from './app.ts';
 
-const PORT = process.env.PORT || 3000;
+import connectDB from './db/index.ts';
 
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
+connectDB()
+.then(() => {
+    app.listen(process.env.PORT || 8000, () => {
+        console.log(`⚙️ Server is running at port : ${process.env.PORT}`);
+    })
+})
+.catch((err) => {
+    console.log("MONGO db connection failed !!! ", err);
+})
