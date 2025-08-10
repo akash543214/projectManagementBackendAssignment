@@ -2,6 +2,11 @@ import type { Request, Response } from "express";
 import { User } from "../models/Users.Models.ts";
 import type { IUser } from "../models/Users.Models.ts";
 import jwt from "jsonwebtoken";
+import { z } from "zod";
+import { LoginUserSchema, RegisterUserSchema } from "../schemas/User.schema.ts";
+
+type RegisterUserRequest = z.infer<typeof RegisterUserSchema>;
+type LoginUserRequest = z.infer<typeof LoginUserSchema>;
 
 interface AuthRequest extends Request {
   user?: IUser;
@@ -20,7 +25,7 @@ const generateAccessAndRefreshTokens = async (userId: string) => {
   return { accessToken, refreshToken };
 };
 
-const loginUser = async (req: Request, res: Response) => {
+const loginUser = async (req: Request<{}, {}, LoginUserRequest>, res: Response) => {
   try {
     const { email, password }: { email: string; password: string } = req.body;
 
@@ -109,9 +114,14 @@ const refreshAccessToken = async (req: Request, res: Response) => {
   }
 };
 
-const createUsers = async (req: Request, res: Response) => {
+const createUsers = async (req: Request<{}, {}, RegisterUserRequest>, res: Response) => {
   const { name, email, password }: { name: string; email: string; password: string } = req.body;
   try {
+    const existingUser = await User.find({ email });
+    if (existingUser.length > 0) {
+      return res.status(400).json({ error: "User already exists" });
+    }
+
     const user = await User.create({ name, email, password });
     res.status(201).json(user);
   } catch (err) {

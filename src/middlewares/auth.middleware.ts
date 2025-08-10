@@ -4,12 +4,10 @@ import type { JwtPayload } from "jsonwebtoken";
 import { User } from "../models/Users.Models.ts";
 import type { IUser } from "../models/Users.Models.ts";
 
-// Extend Express Request type to include `user`
 interface AuthenticatedRequest extends Request {
   user?: Omit<IUser, "password" | "refreshToken">;
 }
 
-// Define token payload type
 interface TokenPayload extends JwtPayload {
   _id: string;
 }
