@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { Task } from "../models/Tasks.Models.ts";
 import type { IUser } from "../models/Users.Models.ts";
+import { Project } from "../models/Projects.Models.ts";
 
 
 interface AuthRequest extends Request {
@@ -17,7 +18,11 @@ type taskRequest = {
 const createTask = async (req: AuthRequest, res: Response) => {
 
   const { title, description,status,dueDate }: taskRequest = req.body;
-    
+    if(!req.params.projectId)
+        {
+             return res.status(400).json({ error: "Project ID is required" });   
+        }
+
      const user = req?.user?._id;
 
     if (!user) {
@@ -27,15 +32,19 @@ const createTask = async (req: AuthRequest, res: Response) => {
 
   try {
 
-    const project = await Task.create({ 
+    const task = await Task.create({ 
        title: title, 
        description: description,
         status: status,
-       duedate: dueDate, 
+       dueDate: dueDate, 
        user: user,
        project: req.params.projectId });
 
-    res.status(201).json(project);
+         await Project.findByIdAndUpdate(req.params.projectId, {
+      $push: { tasks: task._id },
+    });
+    
+    res.status(201).json(task);
   } catch (err) {
     console.error("Error creating task:", err);
     res.status(500).json(err);

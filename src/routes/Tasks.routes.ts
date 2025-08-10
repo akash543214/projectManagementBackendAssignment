@@ -6,7 +6,7 @@ import { verifyJWT } from "../middlewares/auth.middleware.ts";
 
 const router = Router();
 
-router.route('/create-task').post(verifyJWT,createTask);
+router.route('/create-task/:projectId').post(verifyJWT,createTask);
 router.route('/tasks/:projectId').get(verifyJWT,getAllTasks);
 router.route('/update-task/:projectId').patch(verifyJWT,updateTask);
 

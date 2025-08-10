@@ -22,8 +22,9 @@ app.use(cookieParser());
 
 import userRouter from './routes/Users.routes.ts';
 import projectRouter from './routes/Projects.routes.ts';
+import taskRouter from './routes/Tasks.routes.ts';
 
 app.use("/api", userRouter);
 app.use("/api", projectRouter);
-
+app.use("/api", taskRouter);
 export default app;
