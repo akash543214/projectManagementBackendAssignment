@@ -1,11 +1,13 @@
+// src/models/Projects.Models.ts
 import mongoose, { Document, Schema, model, Types } from "mongoose";
 
 export interface IProject extends Document {
-  _id: Types.ObjectId;
+  _id: string;
   title: string;
   description: string;
   status: "active" | "completed";
   tasks: Types.ObjectId[]; 
+  user: Types.ObjectId;    
 }
 
 const ProjectSchema = new Schema<IProject>(
@@ -27,9 +29,14 @@ const ProjectSchema = new Schema<IProject>(
     tasks: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Task", 
+        ref: "Task",
       },
     ],
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   { timestamps: true }
 );

@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { z } from "zod";
 import { LoginUserSchema, RegisterUserSchema } from "../schemas/User.schema.ts";
 
+
 type RegisterUserRequest = z.infer<typeof RegisterUserSchema>;
 type LoginUserRequest = z.infer<typeof LoginUserSchema>;
 
@@ -40,6 +41,8 @@ const loginUser = async (req: Request<{}, {}, LoginUserRequest>, res: Response) 
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id.toString());
+    console.log("Access Token:", accessToken);
+    console.log("Refresh Token:", refreshToken);
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
 
     const cookieOptions = { httpOnly: true, secure: true };

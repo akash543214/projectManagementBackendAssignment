@@ -11,7 +11,7 @@ import { createValidationMiddleware } from "../utils/CreateValidationMiddleware.
    const validateLogin = createValidationMiddleware(LoginUserSchema);
 const router = Router();
 
-router.route('/login-user').post(validateLogin,loginUser);
+router.route('/login-user').post(loginUser);
 router.route('/register-user').post(validateRegistration,createUsers);
 router.route('/logout-user').post(verifyJWT, logoutUser);
 
