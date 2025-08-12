@@ -1,0 +1,246 @@
+// apiService.js
+const BASE_URL = import.meta.env.VITE_API_URL;
+//import { Task } from "@/types/common";
+import axios from 'axios';
+
+// Configure axios instance with default settings
+const axiosInstance = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true, 
+});
+
+
+export const deleteTask = async (taskId:number) => {
+
+ try {
+    const response = await axiosInstance.delete(`/task/delete-task/${taskId}`);
+    return response.data; 
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.message || `HTTP error! Status: ${error.response?.status}`;
+      console.error("Error adding task:", errorMessage);
+      throw new Error(errorMessage);
+    }
+    console.error("Error adding task:", error);
+    throw error;
+  }
+};
+
+export const createUser = async (User: { name: string; email: string; password: string; }) => {
+
+ try {
+    const response = await axiosInstance.post('/register-user', User);
+    return response.data; 
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.message || `HTTP error! Status: ${error.response?.status}`;
+      console.error("Error adding task:", errorMessage);
+      throw new Error(errorMessage);
+    }
+    console.error("Error adding task:", error);
+    throw error;
+  }
+    
+};
+
+export const deleteUser = async () => {
+
+  /*
+  try {
+    const response = await fetch(`${BASE_URL}/remove`, {
+      method: "DELETE",
+    });
+    return handleResponse(response);
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    throw error;
+  }
+    */
+};
+
+
+export const loginUser = async(User: { email: string;
+   password: string; })=>{
+
+ try {
+    const response = await axiosInstance.post('/login-user', User);
+    return response.data; 
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.message || `HTTP error! Status: ${error.response?.status}`;
+      console.error("Error adding task:", errorMessage);
+      throw new Error(errorMessage);
+    }
+    console.error("Error adding task:", error);
+    throw error;
+  }
+}
+
+export const verifyUserlogin = async()=>{
+
+try {
+    const response = await axiosInstance.post('/verify-login');
+    return response.data; 
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.message || `HTTP error! Status: ${error.response?.status}`;
+      console.error("Error adding task:", errorMessage);
+      throw new Error(errorMessage);
+    }
+    console.error("Error adding task:", error);
+    throw error;
+  }
+}
+
+export const logoutUser = async()=>{
+
+   try {
+    const response = await axiosInstance.post('/logout-user');
+    return response.data; 
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.message || `HTTP error! Status: ${error.response?.status}`;
+      console.error("Error adding task:", errorMessage);
+      throw new Error(errorMessage);
+    }
+    console.error("Error adding task:", error);
+    throw error;
+  }
+}
+
+export const updateUser = async (updateObj: { fieldToUpdate: any; }) => {
+  const { fieldToUpdate } = updateObj;
+
+  if (!fieldToUpdate) {
+    console.error("Invalid update object:", updateObj);
+    return;
+  }
+
+  try {
+    const response = await axiosInstance.patch('/user/update-profile',fieldToUpdate);
+    return response.data; 
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.message || `HTTP error! Status: ${error.response?.status}`;
+      console.error("Error adding task:", errorMessage);
+      throw new Error(errorMessage);
+    }
+    console.error("Error adding task:", error);
+    throw error;
+  }
+    
+};
+
+export const updatePassword = async (updateObj: { fieldToUpdate: any; }) => {
+  const { fieldToUpdate } = updateObj;
+
+  if (!fieldToUpdate) {
+    console.error("Invalid update object:", updateObj);
+    return;
+  }
+
+  try {
+    const response = await fetch(`${BASE_URL}/update-password`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(fieldToUpdate || {}),
+    });
+      return await response.json();
+     
+   
+  } catch (error) {
+    console.error("Error updating password:", error);
+    throw error;
+  }
+}
+
+
+export const generateTaskAI = async (
+  prompt: { prompt: string },
+  signal?: AbortSignal
+) => {
+  
+  try {
+    const response = await axiosInstance.post('/task/generate-task', prompt, {
+      signal,
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isCancel(error)) {
+      console.warn('Request canceled:', error.message);
+      return; // or handle accordingly
+    }
+    if (axios.isAxiosError(error)) {
+      const errorMessage =
+        error.response?.data?.message ||
+        `HTTP error! Status: ${error.response?.status}`;
+      console.error('Error adding task:', errorMessage);
+      throw new Error(errorMessage);
+    }
+    console.error('Error adding task:', error);
+    return error;
+  }
+};
+
+export const overView = async () => {
+ 
+  try {
+    const response = await axiosInstance.get('/task/overview');
+    return response.data; 
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.message || `HTTP error! Status: ${error.response?.status}`;
+      console.error("Error adding task:", errorMessage);
+      throw new Error(errorMessage);
+    }
+    console.error("Error adding task:", error);
+    throw error;
+  }
+    
+};
+
+
+export const AskOtto = async (  promptMessage: { promptMessage: string,projectId:number }
+) => {
+ 
+  try {
+    const response = await axiosInstance.post(`/task/otto-ai/${promptMessage.projectId}`,promptMessage);
+    return response.data; 
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.message || `HTTP error! Status: ${error.response?.status}`;
+      console.error("Error fetching otto response:", errorMessage);
+      throw new Error(errorMessage);
+    }
+    console.error("Error adding task:", error);
+    throw error;
+  }
+    
+};
+
+export const getChats = async (  projectId: number) => {
+ 
+  try {
+    const response = await axiosInstance.get(`/task/get-chats/${projectId}`);
+    return response.data; 
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.message || `HTTP error! Status: ${error.response?.status}`;
+      console.error("Error fetching otto response:", errorMessage);
+      throw new Error(errorMessage);
+    }
+    console.error("Error adding task:", error);
+    throw error;
+  }
+    
+};
+export const googleAuth = async()=>{
+  
+  window.location.href = `${BASE_URL}/google`;
+
+}
+

@@ -94,6 +94,26 @@ const updateTask = async (req: AuthRequest, res: Response) => {
     res.status(500).json(err);
   }
 };
+const deleteTask = async (req: AuthRequest, res: Response) => {
+  const taskId = req.params.taskId;
 
+  try {
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
 
-export { createTask, getAllTasks, updateTask };
+    const result = await Task.deleteOne({ _id: taskId, user: userId });
+    
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "Task not found or not owned by user" });
+    }
+
+    res.status(200).json({ message: "Task deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting task:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export { createTask, getAllTasks, updateTask,deleteTask };

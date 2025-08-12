@@ -47,6 +47,29 @@ const getAllProjects = async (req: AuthRequest, res: Response) => {
   }
 };
 
+const deleteProject = async (req: AuthRequest, res: Response) => {
+  const projectId = req.params.projectId;
+
+  try {
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const result = await Project.deleteOne({ _id: projectId, user: userId });
+    
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "Project not found or not owned by user" });
+    }
+
+    res.status(200).json({ message: "Project deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting project:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
 const getProjectById = async (req: AuthRequest, res: Response) => {
 
     
@@ -98,4 +121,4 @@ const updateProject = async (req: AuthRequest, res: Response) => {
 };
 
 
-export { createProject, getAllProjects, getProjectById, updateProject };
+export { createProject, getAllProjects, getProjectById, updateProject,deleteProject };

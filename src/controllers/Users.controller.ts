@@ -4,6 +4,7 @@ import type { IUser } from "../models/Users.Models.ts";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
 import { LoginUserSchema, RegisterUserSchema } from "../schemas/User.schema.ts";
+import { success } from "zod/v4";
 
 
 type RegisterUserRequest = z.infer<typeof RegisterUserSchema>;
@@ -41,8 +42,7 @@ const loginUser = async (req: Request<{}, {}, LoginUserRequest>, res: Response) 
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id.toString());
-    console.log("Access Token:", accessToken);
-    console.log("Refresh Token:", refreshToken);
+
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
 
     const cookieOptions = { httpOnly: true, secure: true };
@@ -116,6 +116,25 @@ const refreshAccessToken = async (req: Request, res: Response) => {
     res.status(401).json({ msg: "Invalid refresh token" });
   }
 };
+const verifyLogin = async (req: AuthRequest, res: Response) => {
+
+try {
+    if (!req.user) {
+      return res.status(401).json({success:false, error: "Unauthorized" });
+    }
+        const loggedInUser = await User.findById(req.user._id).select("-password -refreshToken");
+
+    if (!loggedInUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.status(200).json({ success:true,user: loggedInUser });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+
+};
+
 
 const createUsers = async (req: Request<{}, {}, RegisterUserRequest>, res: Response) => {
   const { name, email, password }: { name: string; email: string; password: string } = req.body;
@@ -126,11 +145,13 @@ const createUsers = async (req: Request<{}, {}, RegisterUserRequest>, res: Respo
     }
 
     const user = await User.create({ name, email, password });
-    res.status(201).json(user);
+        const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+
+    res.status(201).json({user:loggedInUser,success:true});
   } catch (err) {
     console.error("Error creating user:", err);
     res.status(500).json(err);
   }
 };
 
-export { createUsers, loginUser, logoutUser, refreshAccessToken };
+export { createUsers, loginUser, logoutUser, refreshAccessToken,verifyLogin };
